@@ -1,5 +1,11 @@
 # user-management-dashboard
 
+to run fromtend
+- open the folder in vscode
+- open integrated terminal in root of the folder
+- in terminal type command "npm install" and press enter to install the node packages
+- after installation is complete type "npm run" and press enter to run the application
+
 
 <img width="770" alt="Screenshot (919)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/f2073815-b15e-4199-9cfe-09a852f52c40">
 <img width="769" alt="Screenshot (920)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/5faff44e-07a6-4458-a234-0bd1bc9d4433">
