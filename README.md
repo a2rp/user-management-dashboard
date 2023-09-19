@@ -8,16 +8,18 @@ run backend
 - in terminal type command "npm install" and press enter to install the node packages
 - after installation is complete type "npm run devStart" and press enter to run the application
 - open "postman" and run the endpoint
-http://localhost:1198/api/v1/user-add
-Content-Type: application/json
-{
-    "name":"ashish ranjan",
-    "email": "admin@mail.com",
-    "password": "12345678",
-    "password_confirm": "12345678",
-    "role": "administrator"
-}
+<br />
+http://localhost:1198/api/v1/user-add<br />
+Content-Type: application/json<br />
+{<br />
+    "name":"ashish ranjan",<br />
+    "email": "admin@mail.com",<br />
+    "password": "12345678",<br />
+    "password_confirm": "12345678",<br />
+    "role": "administrator"<br />
+}<br />
 this will add user "admin" with password "12345678" into the mongodb
+<br /><br />
 
 to run frontend
 - open the folder in vscode
