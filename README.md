@@ -69,9 +69,13 @@ after successful addition all the users can be seen on the home page
 - "viewers" can only view users
 <br />
 <img width="769" alt="Screenshot (933)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/2a12baf3-098e-4503-b9f0-26ac89abaeef">
+<br />
 
+any user can be searched on the basis of their attributes
 <br />
 <img width="769" alt="Screenshot (934)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/5b9d4dcc-0e57-4522-bc54-ce07457502bb">
+<br />
+
 
 <br />
 <img width="770" alt="Screenshot (935)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/d84e23eb-fd85-45b4-ab76-68483a5ff1d9">
