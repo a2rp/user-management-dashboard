@@ -30,10 +30,14 @@ to run frontend
 login
 <br />
 <img width="770" alt="Screenshot (919)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/f2073815-b15e-4199-9cfe-09a852f52c40">
+<br />
 
+receive error on invalid login
 <br />
 <img width="769" alt="Screenshot (920)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/5faff44e-07a6-4458-a234-0bd1bc9d4433">
+<br />
 
+on successful login you get directed to dashboard
 <br />
 <img width="768" alt="Screenshot (921)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/3af89207-e7f2-42fe-9f42-d6bb8be4d969">
 
