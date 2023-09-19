@@ -37,10 +37,12 @@ receive error on invalid login
 <img width="769" alt="Screenshot (920)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/5faff44e-07a6-4458-a234-0bd1bc9d4433">
 <br />
 
-on successful login you get directed to dashboard
+on successful login you get directed to home page
 <br />
 <img width="768" alt="Screenshot (921)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/3af89207-e7f2-42fe-9f42-d6bb8be4d969">
+<br />
 
+add new user as "administrator", "editor" or "viewer"
 <br />
 <img width="768" alt="Screenshot (923)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/07a91474-fe74-4f6a-add0-3166b3449019">
 
@@ -55,7 +57,9 @@ on successful login you get directed to dashboard
 
 <br />
 <img width="771" alt="Screenshot (927)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/615c5ece-eba7-434c-a640-7927cc2312d8">
+<br />
 
+after successful addition all the users can be seen on the home page
 <br />
 <img width="770" alt="Screenshot (932)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/77df1e8c-0b2a-4510-a935-559da6967a68">
 
