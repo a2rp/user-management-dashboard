@@ -62,7 +62,11 @@ add new user as "administrator", "editor" or "viewer"
 after successful addition all the users can be seen on the home page
 <br />
 <img width="770" alt="Screenshot (932)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/77df1e8c-0b2a-4510-a935-559da6967a68">
+<br />
 
+- "administrator" can add new user, edit user, or delete user
+- "editors" can only edit users
+- "viewers" can only view users
 <br />
 <img width="769" alt="Screenshot (933)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/2a12baf3-098e-4503-b9f0-26ac89abaeef">
 
