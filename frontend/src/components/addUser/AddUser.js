@@ -1,15 +1,15 @@
 import { Button, FormControl, FormLabel, Input, Select, Text } from "@chakra-ui/react";
-import axios from "axios";
 import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
+import api from "../../api";
 
 const AddUser = () => {
     const navigate = useNavigate(null);
     useEffect(() => {
         if (window.localStorage.getItem("role") !== "administrator") {
-            navigate("/home");
+            navigate("/home", { replace: true });
         }
-    }, []);
+    }, [navigate]);
 
     // add user
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,7 +30,6 @@ const AddUser = () => {
     const handleAddUserSubmit = (event) => {
         event.preventDefault();
 
-        console.log(inputs);
         if (inputs.role === "") {
             setResponse("role not selected");
             return;
@@ -38,24 +37,19 @@ const AddUser = () => {
 
         setIsSubmitting(true);
         setResponse("");
-        axios.post(`http://localhost:1198/api/v1/user-add`, inputs).then(response => {
-            console.log(response);
-            if (response.data.success) {
+        api.post("/user-add", inputs).then(({ data }) => {
+            if (data.success) {
                 window.location.reload();
             }
-            setResponse(response.data.message);
+            setResponse(data.message);
         }).catch(error => {
-            console.log(error);
-            setResponse(error.message);
+            setResponse(error.response?.data?.message || "Could not add this user.");
         }).finally(() => {
             setIsSubmitting(false);
         });
     };
 
-    const [selected, setSelected] = useState();
     const handleRoleChange = event => {
-        console.log(event.target.value);
-        setSelected(event.target.value);
         setInputs({ ...inputs, role: event.target.value });
     };
 
@@ -69,7 +63,7 @@ const AddUser = () => {
                     <div style={{ display: "flex", alignItems: "center", gap: "30px" }}>
                         <div style={{ width: "50%" }}>
                             <FormLabel htmlFor="name">Name</FormLabel>
-                            <Input type="name" id="name" name="name" onChange={handleInputsChange} required value={inputs.name} placeholder="name" />
+                            <Input type="text" id="name" name="name" maxLength={100} onChange={handleInputsChange} required value={inputs.name} placeholder="name" />
                         </div>
                         <div style={{ width: "50%" }}>
                             <FormLabel htmlFor="email">Email address</FormLabel>
@@ -81,15 +75,15 @@ const AddUser = () => {
                     <div style={{ display: "flex", alignItems: "center", gap: "30px" }}>
                         <div style={{ width: "50%" }}>
                             <FormLabel htmlFor="password" marginTop="30px">Password</FormLabel>
-                            <Input type="password" id="password" name="password" placeholder="Password" onChange={handleInputsChange} required value={inputs.password} />
+                            <Input type="password" id="password" name="password" minLength={12} maxLength={72} autoComplete="new-password" placeholder="At least 12 characters" onChange={handleInputsChange} required value={inputs.password} />
                         </div>
                         <div style={{ width: "50%" }}>
                             <FormLabel htmlFor="password_confirm" marginTop="30px">Password Confirm</FormLabel>
-                            <Input type="password" id="password_confirm" name="password_confirm" placeholder="Password Confirm" onChange={handleInputsChange} required value={inputs.password_confirm} />
+                            <Input type="password" id="password_confirm" name="password_confirm" minLength={12} maxLength={72} autoComplete="new-password" placeholder="Confirm password" onChange={handleInputsChange} required value={inputs.password_confirm} />
                         </div>
                     </div>
 
-                    <Select placeholder="Select option" onChange={handleRoleChange} value={selected} marginTop="30px">
+                    <Select placeholder="Select option" onChange={handleRoleChange} value={inputs.role} marginTop="30px" required>
                         <option value="administrator">administrator</option>
                         <option value="viewer">viewer</option>
                         <option value="editor">editor</option>
@@ -110,6 +104,7 @@ const AddUser = () => {
                         mt={4}
                         marginTop="50px"
                         colorScheme="red"
+                        type="button"
                         onClick={() => {
                             window.location.reload();
                         }}

@@ -1,111 +1,105 @@
-# user-management-dashboard
+# User Management Dashboard
 
-to run this application
+A full-stack user directory with sign-in and administrator, editor, and viewer roles. The React dashboard uses an Express API backed by MongoDB.
 
-run backend
-- open the "backend" folder in vscode
-- open integrated terminal in root of the folder
-- in terminal type command "npm install" and press enter to install the node packages
-- after installation is complete type "npm run devStart" and press enter to run the application
-- open "postman" and run the endpoint
-<br />
-http://localhost:1198/api/v1/user-add<br />
-Content-Type: application/json<br />
-{<br />
-    "name":"ashish ranjan",<br />
-    "email": "admin@mail.com",<br />
-    "password": "12345678",<br />
-    "password_confirm": "12345678",<br />
-    "role": "administrator"<br />
-}<br />
-this will add user "admin" with password "12345678" into the mongodb
-<br /><br />
+## Features
 
-to run frontend
-- open the folder in vscode
-- open integrated terminal in root of the folder
-- in terminal type command "npm install" and press enter to install the node packages
-- after installation is complete type "npm run start" and press enter to run the application
+- Sign in with email and password
+- Create, search, edit, and remove users according to role
+- Store passwords as bcrypt hashes
+- Keep signed-in sessions in an HTTP-only cookie
+- Enforce role permissions in the API
+- Validate requests and limit repeated sign-in attempts
 
-login
-<br />
-<img width="770" alt="Screenshot (919)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/93ccae2c-b860-4a3f-81c1-766b2fe1687b">
+## Requirements
 
-<br />
+- Node.js 20 or newer
+- MongoDB, running locally or available through a connection URI
 
-receive error on invalid login
-<br />
-<img width="769" alt="Screenshot (920)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/a7a4cb55-ca1f-4053-9d3b-ade95be29d79">
+## Run locally
 
-<br />
+### Configure the backend
 
-on successful login you get directed to home page
-<br />
-<img width="768" alt="Screenshot (921)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/d1dba7a6-bee7-4f85-85e2-4e53e4424765">
-<br />
+```bash
+cd backend
+npm install
+```
 
-add new user as "administrator", "editor" or "viewer"
-<br />
-<img width="768" alt="Screenshot (923)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/d19ebf29-2eee-47f9-be7c-bfdc2a4da26d">
+Copy `.env.example` to `.env`, then set the MongoDB connection and a private JWT secret. Generate a secret with:
 
+```bash
+node -p "require('node:crypto').randomBytes(48).toString('base64')"
+```
 
-<br />
-<img width="769" alt="Screenshot (924)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/12e86d35-b3d5-44fb-b064-67514871e1c7">
+The secret must be at least 32 bytes. Add the initial administrator details to the ignored `.env` file:
 
-<br />
-<img width="770" alt="Screenshot (925)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/4a4bc11e-1000-4f8d-a15a-32110d5f48c8">
+```env
+INITIAL_ADMIN_NAME=Your Name
+INITIAL_ADMIN_EMAIL=you@example.com
+INITIAL_ADMIN_PASSWORD=use-a-unique-password-of-at-least-12-characters
+```
 
+Create the first administrator once, then remove the three `INITIAL_ADMIN_*` entries from `.env`:
 
-<br />
-<img width="771" alt="Screenshot (926)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/3ab2b6cd-6f80-45e0-be17-6457edd006e0">
+```bash
+npm run create:admin
+```
 
-<br />
-<img width="771" alt="Screenshot (927)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/0fd527da-da9d-400e-8877-ad8df08d14fe">
+Start the API:
 
+```bash
+npm run devStart
+```
 
-<br />
+The API listens on `http://localhost:1198` by default. Configure one or more comma-separated frontend origins with `FRONTEND_ORIGINS` if the frontend runs somewhere else. Production cookies require HTTPS, and browser write requests must come from one of the configured origins.
 
-after successful addition all the users can be seen on the home page
-<br />
-<img width="770" alt="Screenshot (932)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/80c6f744-0458-4637-bbde-188308ce8dbb">
+### Start the frontend
 
-<br />
+In a second terminal:
 
-- "administrator" can add new user, edit user, or delete user
-- "editors" can only edit users
-- "viewers" can only view users
-<br />
-<img width="769" alt="Screenshot (933)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/7100e600-c539-4e8c-a1a7-870fffb92e66">
+```bash
+cd frontend
+npm install
+npm start
+```
 
+The frontend uses `http://localhost:1198/api/v1` by default. Set `REACT_APP_API_URL` before starting it to use another API address.
 
-<br />
+## Roles
 
-any user can be searched on the basis of their attributes
-<br /><img width="769" alt="Screenshot (934)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/28a17c91-9d17-46d7-b71b-d45127bc374c">
+| Role | Permissions |
+| --- | --- |
+| Administrator | View users, create users, edit names and roles, and remove other users |
+| Editor | View users and edit names; cannot change roles or remove accounts |
+| Viewer | View the user directory |
 
+Permissions are checked by the backend. Changing browser storage or showing a dashboard control does not grant API access.
 
-<br />
-<img width="770" alt="Screenshot (935)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/59fb195a-04fc-4640-8c32-5f8e246ab39f">
+## API routes
 
+| Method | Route | Access |
+| --- | --- | --- |
+| `POST` | `/api/v1/login` | Public; sets the session cookie |
+| `GET` | `/api/v1/session` | Signed in |
+| `POST` | `/api/v1/logout` | Clears the session cookie |
+| `GET` | `/api/v1/user-all` | Signed in |
+| `POST` | `/api/v1/user` | Signed in; body contains an email |
+| `POST` | `/api/v1/user-add` | Administrator |
+| `PATCH` | `/api/v1/user-update` | Administrator or editor |
+| `DELETE` | `/api/v1/user-delete/:email` | Administrator |
 
-<br />
+New passwords must be at least 12 characters and no more than 72 UTF-8 bytes. Existing bcrypt-hashed passwords remain usable.
 
+## Screenshots
 
-<br />
-<img width="770" alt="Screenshot (936)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/3062362a-4d05-4b54-9838-20d6c5371d80">
+### Sign in
 
+![Login screen](https://github.com/a2rp/user-management-dashboard/assets/5670738/93ccae2c-b860-4a3f-81c1-766b2fe1687b)
 
-<br />
-<img width="768" alt="Screenshot (937)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/6db47fb7-dc32-4d19-9f91-f70e14d233cf">
+### User dashboard
 
+![User dashboard](https://github.com/a2rp/user-management-dashboard/assets/5670738/d1dba7a6-bee7-4f8d-a15a-2e53e4424765)
 
-<br />
-<img width="769" alt="Screenshot (940)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/aff77c60-24bf-4222-9d4f-969a54ba2b81">
+### Add a user
 
-
-
-<br />
-<img width="770" alt="Screenshot (941)" src="https://github.com/a2rp/user-management-dashboard/assets/5670738/06134b23-5291-455b-928c-cde83304eba5">
-
-
-
+![Add user form](https://github.com/a2rp/user-management-dashboard/assets/5670738/d19ebf29-2eee-47f9-8b7c-bfdc2a4da26d)

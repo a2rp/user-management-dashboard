@@ -1,83 +1,77 @@
-import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Button, Input, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react';
-import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom';
-import useDeleteUser from '../../hooks/useDeleteUser';
+import { Button, Input, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../api";
 
 const DisplayAllUsers = () => {
-    const navigate = useNavigate(null);
-    const [userEmail, setUserEmail] = useState(window.localStorage.getItem("email") || "");
+    const navigate = useNavigate();
+    const [userEmail, setUserEmail] = useState("");
     const [role, setRole] = useState("");
-    const [name, setName] = useState("");
-
     const [allUsers, setAllUsers] = useState([]);
-    const [tempUsers, setTempUsers] = useState([]);
-    const getAllUsers = (event) => {
-        axios.get("http://localhost:1198/api/v1/user-all").then(response => {
-            // console.log(response.data);
-            setAllUsers(response.data);
-            setTempUsers(response.data);
-        }).catch(error => {
-            console.error(error);
-        });
-    };
-    useEffect(() => {
-        // console.log(allUsers);
-        // console.log(userEmail);
-    }, [allUsers]);
-
-    useEffect(() => {
-        if (userEmail.length === 0) {
-            return navigate("/login");
-        } else {
-            getUser();
-            getAllUsers();
-        }
-    }, [userEmail]);
-
-    // search
+    const [allUsersUnfiltered, setAllUsersUnfiltered] = useState([]);
     const [search, setSearch] = useState("");
-    const handleSearch = event => {
-        setSearch(event.target.value);
+    const [errorMessage, setErrorMessage] = useState("");
 
-        const searchText = event.target.value.toLowerCase();
-        setAllUsers([]);
-        let newList = tempUsers.filter(function (el) {
-            return el.name.includes(searchText) ||
-                el.userid.includes(searchText) ||
-                el.role.includes(searchText) ||
-                el.email.includes(searchText);
-        });
-        setAllUsers(newList);
-    };
+    useEffect(() => {
+        let active = true;
 
-    const getUser = (event) => {
-        axios.post("http://localhost:1198/api/v1/user", { email: userEmail }).then(response => {
-            if (response.data.success) {
-                setRole(response.data.role);
-                setName(response.data.name);
+        const loadUsers = async () => {
+            try {
+                const { data: session } = await api.get("/session");
+                if (!active) return;
+
+                setUserEmail(session.user.email);
+                setRole(session.user.role);
+                window.localStorage.setItem("email", session.user.email);
+                window.localStorage.setItem("role", session.user.role);
+
+                const { data: users } = await api.get("/user-all");
+                if (!active) return;
+                setAllUsers(users);
+                setAllUsersUnfiltered(users);
+            } catch (error) {
+                if (!active) return;
+                if (error.response?.status === 401 || error.response?.status === 403) {
+                    window.localStorage.removeItem("email");
+                    window.localStorage.removeItem("role");
+                    navigate("/login", { replace: true });
+                    return;
+                }
+                setErrorMessage(error.response?.data?.message || "Could not load users. Check that the API is running.");
             }
-        }).catch(error => {
-            console.error(error);
-        });
+        };
+
+        loadUsers();
+        return () => {
+            active = false;
+        };
+    }, [navigate]);
+
+    const handleSearch = (event) => {
+        const searchText = event.target.value.trim().toLowerCase();
+        setSearch(event.target.value);
+        setAllUsers(allUsersUnfiltered.filter((user) =>
+            [user.name, user.userid, user.role, user.email]
+                .some((value) => value.toLowerCase().includes(searchText))
+        ));
     };
 
-    // edit user
-    const editUser = (email) => {
-        console.log(email);
-        // return <Navigate to={"/edit"} state={{ email }} />
-        return navigate("/edit", { replace: true, state: { email } });
-    };
-
-    // delete user
-    const deleteUser = email => {
-        // console.log(email);
-        return navigate("/delete", { replace: true, state: { email } });
-    };
+    const editUser = (email) => navigate("/edit", { replace: true, state: { email } });
+    const deleteUser = (email) => navigate("/delete", { replace: true, state: { email } });
 
     return (
         <div>
-            <Input type="text" name="search" placeholder="search" onChange={handleSearch} value={search} marginLeft="15px" width="500px" />
+            <Input
+                type="search"
+                name="search"
+                placeholder="Search users"
+                onChange={handleSearch}
+                value={search}
+                marginLeft="15px"
+                width="500px"
+                aria-label="Search users"
+            />
+            {errorMessage && <p role="alert">{errorMessage}</p>}
 
             <TableContainer style={{ border: "3px solid #000", margin: "15px" }}>
                 <Table variant="striped">
@@ -91,46 +85,31 @@ const DisplayAllUsers = () => {
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {Object.keys(allUsers).map((item, index) => (
-                            <Tr key={index} style={{ textAlign: "center" }}>
-                                <Td style={{ textAlign: "center" }}>{allUsers[item].userid}</Td>
-                                <Td style={{ textAlign: "center" }}>{allUsers[item].name}</Td>
-                                <Td style={{ textAlign: "center" }}>{allUsers[item].email}</Td>
-                                <Td style={{ textAlign: "center" }}>{allUsers[item].role}</Td>
+                        {allUsers.map((user) => (
+                            <Tr key={user.userid} style={{ textAlign: "center" }}>
+                                <Td style={{ textAlign: "center" }}>{user.userid}</Td>
+                                <Td style={{ textAlign: "center" }}>{user.name}</Td>
+                                <Td style={{ textAlign: "center" }}>{user.email}</Td>
+                                <Td style={{ textAlign: "center" }}>{user.role}</Td>
                                 <Td style={{ textAlign: "center" }}>
-                                    {allUsers[item].email !== userEmail
-                                        ? <>
-                                            {window.localStorage.getItem("role") === "administrator" || window.localStorage.getItem("role") === "editor"
-                                                ? <Button
-                                                    mt={4}
-                                                    colorScheme="teal"
-                                                    onClick={() => editUser(allUsers[item].email)}
-                                                >
-                                                    Edit {allUsers[item].email}
-                                                </Button>
-                                                : ""}
-
-                                            {window.localStorage.getItem("role") === "administrator"
-                                                ?
-                                                <Button
-                                                    mt={4}
-                                                    colorScheme="red"
-                                                    marginLeft="15px"
-                                                    onClick={() => deleteUser(allUsers[item].email)}
-                                                >
-                                                    Delete {allUsers[item].email}
-                                                </Button>
-                                                : ""}
-                                        </>
-                                        : ""}
+                                    {user.email !== userEmail && (role === "administrator" || role === "editor") && (
+                                        <Button mt={4} colorScheme="teal" onClick={() => editUser(user.email)}>
+                                            Edit {user.email}
+                                        </Button>
+                                    )}
+                                    {user.email !== userEmail && role === "administrator" && (
+                                        <Button mt={4} colorScheme="red" marginLeft="15px" onClick={() => deleteUser(user.email)}>
+                                            Delete {user.email}
+                                        </Button>
+                                    )}
                                 </Td>
                             </Tr>
                         ))}
                     </Tbody>
                 </Table>
             </TableContainer>
-        </div >
-    )
-}
+        </div>
+    );
+};
 
-export default DisplayAllUsers
+export default DisplayAllUsers;
